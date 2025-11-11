@@ -21,18 +21,15 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       
-    - name: Build APK
-      run: |
-        # Instalar Android SDK components necesarios
-        sdkmanager "platforms;android-33" "build-tools;33.0.0"
-        
-        # Compilar recursos
-        aapt package -f -m -J src -M app/src/main/AndroidManifest.xml -S app/src/main/res -I "$ANDROID_HOME/platforms/android-33/android.jar"
-        
-        echo "✅ Build completado (simulado)"
-        echo "📱 Para build real: usa Android Studio"
-        
-    - name: Create dummy APK
-      run: |
-        mkdir -p app/build/outputs/apk/debug/
-        echo "APK dummy - Usa Android Studio para build real" > app/build/outputs/apk/debug/app-debug.apk
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+      
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
+      
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7
